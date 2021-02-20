@@ -3,6 +3,7 @@
 
     <dimen name="cardview_radius">4dp</dimen>
     <dimen name="margin_16">16dp</dimen>
+    <dimen name="margin_8">8dp</dimen>
     <dimen name="margin_4">4dp</dimen>
 
     <dimen name="padding_12">12dp</dimen>
@@ -14,4 +15,6 @@
     <dimen name="textsize56">56sp</dimen>
     <dimen name="textsize28">32sp</dimen>
 
+    <dimen name="size_50">50dp</dimen>
+    <dimen name="size_60">60dp</dimen>
 </resources>

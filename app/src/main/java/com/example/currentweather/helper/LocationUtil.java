@@ -1,44 +1,35 @@
 package com.example.currentweather.helper;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.core.app.ActivityCompat;
-
 import java.util.List;
-import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static android.content.Context.LOCATION_SERVICE;
 
 
 //Caller activity needs to handle the permissions
 @SuppressWarnings({"MissingPermission"})
 public class LocationUtil {
 
-    private static final int LAST_KNOWN_LOCATION_DELAY = 5000;//5 seconds
-    private static final int LOCATION_MIN_TIME = 0;
-    private static final int LOCAITON_MIN_DISTANCE = 0;
+    private static final int LAST_KNOWN_LOCATION_DELAY = 1000;//5 seconds
+    private static final int LOCATION_MIN_TIME = 1000;
+    private static final int LOCAITON_MIN_DISTANCE = 500;
 
     private Timer locationTimer;
     private LocationManager locationManager;
     private LocationResult locationResult;
-    private boolean isGPSEnabled;
-    private boolean isNetworkEnabled;
 
-    public static void startUserCurrentLocationListener(final Context context,
-                                                        final LocationUtilListener locationUtilListener) {
+    public static void startUserCurrentLocationListener(final Context context, final LocationUtilListener locationUtilListener) {
         try {
             Log.i("System out", "lat long call started with listener");
 
@@ -70,12 +61,6 @@ public class LocationUtil {
         }
     }
 
-    /**
-     * utility method to return if location is enabled or not
-     *
-     * @param context
-     * @return true if location enabled else false
-     */
     public static boolean isLocationEnabled(Context context) {
         if (context == null)
             return false;
@@ -100,16 +85,6 @@ public class LocationUtil {
         }
     }
 
-    public static boolean isLocationPermissionGranted(Context context) {
-        return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-    }
-
-
-    /**
-     * This timer class will return last known location result
-     * if location manager is not able to get the result in 5 seconds.
-     */
     public interface LocationUtilListener {
         void onLocationResult(Location location);
     }
@@ -121,127 +96,75 @@ public class LocationUtil {
     class GetLastLocation extends TimerTask {
         @Override
         public void run() {
-            Log.d("System out","GetLastLocation is running");
-            locationManager.removeUpdates(locationListenerGps);
-            locationManager.removeUpdates(locationListenerNetwork);
 
-            Location networkLocation = null;
-            Location gpsLocation = null;
+            locationManager.removeUpdates(locationListener);
 
-            if (isGPSEnabled)
-                gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (isNetworkEnabled)
-                networkLocation = locationManager
-                        .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-            // if there are both values use the latest one
-            if (gpsLocation != null && networkLocation != null) {
-                if (gpsLocation.getTime() > networkLocation.getTime()) {
-                    locationResult.gotLocation(gpsLocation);
-                } else {
-                    locationResult.gotLocation(networkLocation);
+            List<String> providers = locationManager.getProviders(true);
+            Location bestLocation = null;
+            for (String provider : providers) {
+                Location l = locationManager.getLastKnownLocation(provider);
+                if (l == null) {
+                    continue;
                 }
-                return;
+                if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                    bestLocation = l;
+
+                }
             }
 
-            if (gpsLocation != null) {
-                locationResult.gotLocation(gpsLocation);
-                return;
-            }
-            if (networkLocation != null) {
-                locationResult.gotLocation(networkLocation);
-                return;
-            }
-            locationResult.gotLocation(null);
+            if (bestLocation == null)
+                locationResult.gotLocation(null);
+            else
+                locationResult.gotLocation(bestLocation);
         }
     }
 
-    /***
-     * Getting user real locations
-     */
-    LocationListener locationListenerNetwork = new LocationListener() {
+    private LocationListener locationListener = new LocationListener() {
+
         public void onLocationChanged(Location location) {
             locationTimer.cancel();
             locationResult.gotLocation(location);
             locationManager.removeUpdates(this);
-            locationManager.removeUpdates(locationListenerGps);
-
+            locationManager.removeUpdates(locationListener);
         }
 
         public void onProviderDisabled(String provider) {
-            Log.i("System out","Network onProviderDisabled");
+            Log.i("System out", "GPS onProviderDisabled");
         }
 
         public void onProviderEnabled(String provider) {
-            Log.i("System out","Network onProviderEnabled");
+            Log.i("System out", "GPS onProviderEnabled");
         }
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.i("System out","Network onStatusChanged");
-        }
-    };
-    LocationListener locationListenerGps = new LocationListener() {
-        public void onLocationChanged(Location location) {
-            locationTimer.cancel();
-            locationResult.gotLocation(location);
-            locationManager.removeUpdates(this);
-            locationManager.removeUpdates(locationListenerNetwork);
-        }
-
-        public void onProviderDisabled(String provider) {
-            Log.i("System out","GPS onProviderDisabled");
-        }
-
-        public void onProviderEnabled(String provider) {
-            Log.i("System out","GPS onProviderEnabled");
-        }
-
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.i("System out","GPS onStatusChanged");
+            Log.i("System out", "GPS onStatusChanged");
         }
     };
 
-
-    /**
-     * Method to get the real user location
-     *
-     * @param context
-     * @param result
-     * @return
-     */
     private boolean getLocation(Context context, LocationResult result) {
+
         locationResult = result;
         if (locationManager == null)
-            locationManager = (LocationManager) context
-                    .getSystemService(Context.LOCATION_SERVICE);
+            locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
 
-        // exceptions will be thrown if provider is not permitted.
-        try {
-            isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch (Exception ex) {
-            Log.e("System out", ex.toString());
-        }
-        try {
-            isNetworkEnabled = locationManager
-                    .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch (Exception ex) {
-            Log.e("System out", ex.toString());
-        }
-
-        // don't start listeners if no provider is enabled
-        if (!isGPSEnabled && !isNetworkEnabled)
-            return false;
-
-        if (isGPSEnabled) {
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             locationManager.getProvider(LocationManager.GPS_PROVIDER).supportsAltitude();
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_MIN_TIME, LOCAITON_MIN_DISTANCE,
-                    locationListenerGps);
-        }
-        if (isNetworkEnabled) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                    LOCATION_MIN_TIME,
+                    LOCAITON_MIN_DISTANCE,
+                    locationListener);
+        } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                    LOCATION_MIN_TIME, LOCAITON_MIN_DISTANCE,
-                    locationListenerNetwork);
+                    LOCATION_MIN_TIME,
+                    LOCAITON_MIN_DISTANCE,
+                    locationListener);
+        } else {
+            locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER,
+                    LOCATION_MIN_TIME,
+                    LOCAITON_MIN_DISTANCE,
+                    locationListener);
         }
+
         locationTimer = new Timer();
         locationTimer.schedule(new GetLastLocation(), LAST_KNOWN_LOCATION_DELAY);
         return true;

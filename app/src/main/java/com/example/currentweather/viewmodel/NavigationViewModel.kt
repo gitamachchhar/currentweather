@@ -18,11 +18,12 @@ class NavigationViewModel(application: Application) : BaseCoroutinesViewModel(ap
         return navigateToHomeScreenFromMoreScreen
     }
 
-    fun GoToMoreScreenFromHomePage() {
+    fun goToMoreScreenFromHomePage() {
+        navigateToMoreScreenFromHomeScreen.hasActiveObservers()
         navigateToMoreScreenFromHomeScreen.postValue(true)
     }
 
-    fun GoToHomeScreenFromMorePage() {
+    fun goToHomeScreenFromMorePage() {
         navigateToHomeScreenFromMoreScreen.postValue(true)
     }
 

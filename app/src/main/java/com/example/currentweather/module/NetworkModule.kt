@@ -2,6 +2,7 @@ package com.example.currentweather.module
 
 import com.example.currentweather.BuildConfig
 import com.example.currentweather.di.qualifiers.BaseOkHttpBuilder
+import com.example.currentweather.di.scope.FeatureScope
 import com.example.currentweather.remote.HeaderInterceptor
 import dagger.Module
 import dagger.Provides
@@ -14,12 +15,14 @@ import retrofit2.converter.gson.GsonConverterFactory
 class NetworkModule {
 
     @Provides
+    @FeatureScope
     fun getHeaderInterceptor() : HeaderInterceptor {
         return HeaderInterceptor()
     }
 
 
     @Provides
+    @FeatureScope
     @BaseOkHttpBuilder
     fun baseOkHttpBuilder(headerInterceptor: HeaderInterceptor): Retrofit {
         val builder = OkHttpClient.Builder()

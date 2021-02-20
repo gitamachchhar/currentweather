@@ -3,8 +3,9 @@ package com.example.currentweather.helper
 
 class CurrentWeatherConstants {
 
-        object DateFormat {
-            public const val CURRENT_DATE_FORMAT = "mmmm DD, HH:MM"
+        companion object {
+            const val CURRENT_DATE_FORMAT = "MMMM dd, HH:mm a"
+            const val DATABASE_NAME = "WeatherInfo"
         }
 
 

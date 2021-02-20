@@ -1,14 +1,10 @@
 package com.example.currentweather.viewmodel
 
-import android.annotation.SuppressLint
 import android.app.Application
-import android.content.Context
 import android.content.Intent
 import android.location.Location
-import android.location.LocationManager
 import android.net.Uri
 import android.provider.Settings
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import com.example.currentweather.helper.LocationUtil
@@ -32,7 +28,7 @@ class LocationViewModel(application: Application) : BaseCoroutinesViewModel(appl
     fun getLatLong() {
         if (LocationUtil.isLocationEnabled(getApplication())) {
             LocationUtil.startUserCurrentLocationListener(getApplication()) {
-                if (it != null) userLocation.postValue(it) else locationEnabled.postValue(false)
+                userLocation.postValue(it)
             }
 
         } else {
