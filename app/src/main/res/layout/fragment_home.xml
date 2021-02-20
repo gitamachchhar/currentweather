@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="weatherUtil"
+            type="com.example.currentweather.helper.CurrentWeatherUtils.Companion" />
+
+        <variable
+            name="dateValue"
+            type="String" />
+
+        <variable
+            name="tempValue"
+            type="String" />
+
+        <variable
+            name="feelValue"
+            type="String" />
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@{weatherUtil.isDayTime() ? @drawable/bg_gradient_day : @drawable/bg_gradient_night}">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/margin_16"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_date_value"
+                style="@style/date_style"
+                android:text="@{dateValue}"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="February 18, 2021, 12:45 PM" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_temp_value"
+                style="@style/temperature_style"
+                android:layout_marginTop="@dimen/margin_16"
+                android:text="@{tempValue}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_date_value"
+                tools:text="28" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_temp_type"
+                style="@style/date_style"
+                android:paddingLeft="@dimen/padding_8"
+                android:paddingTop="@dimen/padding_16"
+                android:text="o"
+                android:textColor="@color/colorWhite"
+                app:layout_constraintStart_toEndOf="@+id/tv_temp_value"
+                app:layout_constraintTop_toBottomOf="@+id/tv_date_value" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_temp_type_value"
+                style="@style/temperature_type_style"
+                android:paddingTop="@dimen/padding_12"
+                android:text="C"
+                app:layout_constraintStart_toEndOf="@+id/tv_temp_type"
+                app:layout_constraintTop_toBottomOf="@+id/tv_date_value" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_feels_like"
+                style="@style/date_style"
+                android:textColor="@color/colorWhite"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_temp_value"
+                tools:text="Feels like 28"
+                android:text="@{@string/feels_like(feelValue)}"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+</layout>

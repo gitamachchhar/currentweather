@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Weather Logger</string>
+    <string name="feels_like">Feels like %s</string>
+    <string name="permission_required_text">Location permission is required to continue.</string>
+</resources>
