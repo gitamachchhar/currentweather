@@ -7,6 +7,7 @@
 #Material design implemetation with navigation architecture.</br>
 #Retorfit and coroutine are used for making api call.</br>
 #Custom animations, transitions between screens are added.</br>
+#Two different UI is added based on time
 
 Some of the optional requiremts are not covered because of time constraint.</br>
 
