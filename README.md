@@ -12,4 +12,5 @@
 Some of the optional requiremts are not covered because of time constraint.</br>
 
 
-![](/app.gif)
+![](/app.gif) ![](/app1.gif)
+
