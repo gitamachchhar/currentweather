@@ -3,16 +3,12 @@ package com.example.currentweather.viewmodel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import com.example.currentweather.helper.RecyclableCompositeDisposable
 import com.example.currentweather.model.Resource
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import retrofit2.Response
 
 abstract class BaseCoroutinesViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val recyclableCompositeDisposable by lazy { RecyclableCompositeDisposable() }
 
     /**
      * This is the main scope for all coroutines launched by MainViewModel.
@@ -83,20 +79,8 @@ abstract class BaseCoroutinesViewModel(application: Application) : AndroidViewMo
         parentJob.cancel()
     }
 
-    /**
-     * Add the provided disposable to list to be disposed when view model is cleared
-     */
-    fun disposeOnClear(d: Disposable) {
-        recyclableCompositeDisposable.add(d)
-    }
-
-    fun Disposable.disposeOnCleared() {
-        recyclableCompositeDisposable.add(this)
-    }
-
     override fun onCleared() {
         cancelParentJob()
-        recyclableCompositeDisposable.disposeAndReset()
         super.onCleared()
     }
 

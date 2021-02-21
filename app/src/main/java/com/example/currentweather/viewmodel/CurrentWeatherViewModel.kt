@@ -9,6 +9,7 @@ import com.example.currentweather.model.CurrentWeatherModel
 import com.example.currentweather.model.Resource
 import com.example.currentweather.model.Status
 import com.example.currentweather.remote.CurrentWeatherService
+import java.util.*
 
 class CurrentWeatherViewModel(application: Application, private val service: CurrentWeatherService, private val weatherRepository: WeatherRepository) : BaseCoroutinesViewModel(application) {
 
@@ -31,6 +32,8 @@ class CurrentWeatherViewModel(application: Application, private val service: Cur
                     parseCurrentWeatherResult(result)
                 })
 
+        } else {
+            error.postValue("No internet!")
         }
 
     }
@@ -51,6 +54,7 @@ class CurrentWeatherViewModel(application: Application, private val service: Cur
 
     private fun saveDataInLocal(currentWeatherModel: CurrentWeatherModel) {
         launchJob {
+            currentWeatherModel.date = Calendar.getInstance().timeInMillis
             weatherRepository.insertWeatherData(currentWeatherModel)
             currentWeatherLiveData.postValue(currentWeatherModel)
         }

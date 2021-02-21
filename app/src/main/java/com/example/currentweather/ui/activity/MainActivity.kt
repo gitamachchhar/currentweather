@@ -1,6 +1,8 @@
 package com.example.currentweather.ui.activity
 
 import android.os.Bundle
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -51,10 +53,6 @@ class MainActivity : BaseComponentProviderActivity<MainAppComponent>() {
         getComponent()?.inject(this)
     }
 
-    fun callClick() {
-        displayMessage("Save button clicked")
-    }
-
     private fun initNavGraph() {
         navController = Navigation.findNavController(this, R.id.nav_fragment)
         val navInflater = navController.navInflater
@@ -76,11 +74,11 @@ class MainActivity : BaseComponentProviderActivity<MainAppComponent>() {
     }
 
     fun showProgressBar() {
-        progressBar.show()
+        progressBar.visibility = VISIBLE
     }
 
     fun hideProgressBar() {
-        progressBar.hide()
+        progressBar.visibility = GONE
     }
 
     override fun getComponent(): MainAppComponent? {

@@ -51,6 +51,7 @@ class HomeFragment : BaseViewBindingFragment<FragmentHomeBinding>() {
 
     private fun observeCurrentWeatherData() {
         weatherViewModel.getCurrentWeatherLiveData().observe(viewLifecycleOwner, Observer {
+            hideProgressBar()
             binding?.dateValue = CurrentWeatherUtils.getCurrentFormattedDate(it?.date?:0)
             binding?.feelValue = CurrentWeatherUtils.kelvinToCelsius(it?.main?.feelsLike?:0.0)
             binding?.tempValue = CurrentWeatherUtils.kelvinToCelsius(it?.main?.temp?:0.0)
@@ -76,9 +77,9 @@ class HomeFragment : BaseViewBindingFragment<FragmentHomeBinding>() {
         locationViewModel.getUserLocation().observe(viewLifecycleOwner, Observer {
             hideProgressBar()
             if (it!= null) {
+                showProgressBar()
                 getCurrentWeatherData(it.latitude, it.longitude)
             } else {
-                getCurrentWeatherData(25.2048, 55.2708)
                 displayMessage("Error in fetching current location")
             }
 
